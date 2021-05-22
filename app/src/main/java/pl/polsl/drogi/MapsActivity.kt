@@ -45,7 +45,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
 
-        val myPlace = LatLng(40.73, -73.99)  // this is New York
+        val myPlace = LatLng(46.73, 73.99)
         map.addMarker(MarkerOptions().position(myPlace).title("My Favorite City"))
         map.moveCamera(CameraUpdateFactory.newLatLng(myPlace))
 
@@ -73,7 +73,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.OnMarker
             if (location != null) {
                 lastLocation = location
                 val currentLatLng = LatLng(location.latitude, location.longitude)
-                map.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 12f))
+//                map.animateCamera(CameraUpdateFactory.newLatLngZoom(currentLatLng, 12f))
             }
         }
 
