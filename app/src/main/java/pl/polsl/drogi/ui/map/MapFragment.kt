@@ -37,11 +37,7 @@ class MapFragment : Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListen
 
         val root = inflater.inflate(R.layout.fragment_map, container, false)
 
-
         try {
-            val xd = fragmentManager
-            val xx = fragmentManager?.
-            findFragmentById(R.id.map)
 
             val mapFragment = childFragmentManager?.
             findFragmentById(R.id.map)
@@ -50,9 +46,7 @@ class MapFragment : Fragment(),OnMapReadyCallback, GoogleMap.OnMarkerClickListen
         }
         catch (e:Exception )
         {
-            val x = e.cause
-            val y = e.message
-            val xd = x
+
         }
 
 
