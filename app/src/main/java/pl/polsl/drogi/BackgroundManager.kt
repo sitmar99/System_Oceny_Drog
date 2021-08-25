@@ -33,12 +33,12 @@ object BackgroundManager {
 
     }
 
-    fun VeryLateInit(context:Context) {
+    fun veryLateInit(context:Context) {
         this.context = context
         accelerometerSensor = AccelerometerSensor(context);
         accelerometerSensor.start()
 
-        this.subscribeAcc { sendRequest(it) }
+//        this.subscribeAcc { sendRequest(it) }
     }
 
     fun sendRequest(v:Vector3D) {

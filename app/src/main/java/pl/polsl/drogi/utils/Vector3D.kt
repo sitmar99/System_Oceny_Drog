@@ -24,11 +24,15 @@ class Vector3D {
         return v.x == x && v.y ==  y && v.z == z
     }
 
-    fun add(v: Vector3D): Vector3D {
+    fun epsilonEquals(v:Vector3D,bias:Float):Boolean {
+        return abs(x-v.x) < bias || abs(y-v.y) < bias || abs(z-v.z) < bias
+    }
+
+    operator fun plus(v:Vector3D): Vector3D {
         return Vector3D(x + v.x, y + v.y, z + v.z)
     }
 
-    fun subtract(v: Vector3D): Vector3D {
+    operator fun minus(v: Vector3D): Vector3D {
         return Vector3D(x - v.x, y - v.y, z - v.z)
     }
 
@@ -36,11 +40,14 @@ class Vector3D {
         return x * v.x + y * v.y + z * v.z
     }
 
-    fun greaterThanAny(v: Vector3D): Boolean {
-        return abs(x) > v.x || abs(y) > v.y || abs(z) > v.z
-    }
-
     fun project(onToVector: Vector3D): Float {
         return dot(onToVector) / onToVector.dot(onToVector)
+    }
+
+    fun abs():Vector3D{
+        x = abs(x)
+        y = abs(y)
+        z = abs(z)
+        return Vector3D(x,y,z)
     }
 }

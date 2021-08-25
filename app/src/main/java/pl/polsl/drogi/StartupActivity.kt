@@ -22,7 +22,7 @@ class StartupActivity : AppCompatActivity() {
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        BackgroundManager.VeryLateInit(applicationContext)
+        BackgroundManager.veryLateInit(applicationContext)
 
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)
