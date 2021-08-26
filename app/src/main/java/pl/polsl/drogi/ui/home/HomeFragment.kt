@@ -1,24 +1,22 @@
 package pl.polsl.drogi.ui.home
 
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
-import com.android.volley.Request
-import com.android.volley.Response
-import com.android.volley.toolbox.StringRequest
-import com.android.volley.toolbox.Volley
 import pl.polsl.drogi.BackgroundManager
 import pl.polsl.drogi.R
-import pl.polsl.drogi.utils.Vector3D
 
 class HomeFragment : Fragment() {
 
-    var duspa : TextView? = null
+    var textStatus : TextView? = null
+    var startButton: Button? = null
+    var stopButton: Button? = null
     private var x:String="s"
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -28,18 +26,40 @@ class HomeFragment : Fragment() {
 
         val root = inflater.inflate(R.layout.fragment_home, container, false)
 
-        duspa = root.findViewById<TextView>(R.id.text_home)
-
+        textStatus = root.findViewById(R.id.text_status)
+        startButton= root.findViewById(R.id.button_start)
+        stopButton = root.findViewById(R.id.button_stop)
 
         BackgroundManager.subscribeAcc {
-            updateX(it)
+
         }
+
+        BackgroundManager.subscribeStatusChanged {
+            onStatusChanged(it)
+        }
+
+        startButton?.setOnClickListener {
+                BackgroundManager.start()
+            }
+
+        stopButton?.setOnClickListener {
+                BackgroundManager.stop()
+            }
+
+
         return root
     }
 
-    fun updateX(v:Vector3D) {
-        duspa?.text ="x " + v.x.toString() + " y " +  v.y.toString() + " z " + v.z.toString()
-    }
+    fun onStatusChanged(newStatus:Boolean) {
+        if(newStatus) {
+            textStatus?.text = "ACTIVE"
+            textStatus?.setTextColor(Color.GREEN)
+        }
+        else {
+            textStatus?.text = "INACTIVE"
+            textStatus?.setTextColor(Color.RED)
+        }
 
+    }
 
 }

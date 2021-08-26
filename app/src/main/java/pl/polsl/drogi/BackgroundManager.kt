@@ -1,75 +1,99 @@
 package pl.polsl.drogi
 
+import android.annotation.SuppressLint
 import android.content.Context
 import com.android.volley.Request
 import com.android.volley.Response
+import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonObjectRequest
-import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
-import com.google.gson.Gson
 import org.json.JSONObject
 import pl.polsl.drogi.sensors.AccelerometerSensor
-import pl.polsl.drogi.utils.Vector3D
+import pl.polsl.drogi.sensors.LocalizationSensor
 import java.lang.Exception
-
+typealias scoreType = Float
+@SuppressLint("StaticFieldLeak")
 object BackgroundManager {
 
+    const val serverPostUrl = "https://webhook.site/03a1d307-a37a-463d-bd8f-c5b49543e988"
+
     lateinit var accelerometerSensor: AccelerometerSensor
-    var odpowiedz = ""
+    lateinit var localizationSensor: LocalizationSensor
     var context :Context? = null
-    private val accSubscribers=  mutableListOf<(Vector3D) -> Unit>()
+    private val accSubscribers=  mutableListOf<(scoreType) -> Unit>()
+    private var statusChangedSubscribers = mutableListOf<(Boolean) -> Unit>()
+    init {}
 
-    fun notifyAccSubs(vector3D: Vector3D) {
-        accSubscribers.forEach {
-            it.invoke(vector3D)
-        }
+    fun start() {
+        accelerometerSensor.start()
+        localizationSensor.start()
     }
 
-    fun subscribeAcc(func:(Vector3D)->Unit) {
-        accSubscribers.add(func)
-    }
-
-    init {
-
+    fun stop() {
+        localizationSensor.stop()
+        accelerometerSensor.stop()
     }
 
     fun veryLateInit(context:Context) {
         this.context = context
         accelerometerSensor = AccelerometerSensor(context);
-        accelerometerSensor.start()
-
-//        this.subscribeAcc { sendRequest(it) }
+        localizationSensor = LocalizationSensor(context)
+        this.subscribeAcc { sendRequest(it) }
     }
 
-    fun sendRequest(v:Vector3D) {
+    fun notifyAccSubs(score:scoreType) {
+        accSubscribers.forEach {
+            it.invoke(score)
+        }
+    }
+
+    fun notifyStatusSubs(activeStatus:Boolean) {
+        statusChangedSubscribers.forEach{
+            it.invoke(activeStatus)
+        }
+    }
+
+    fun subscribeAcc(func:(scoreType)->Unit) {
+        accSubscribers.add(func)
+    }
+
+    fun subscribeStatusChanged(func:(Boolean)->Unit) {
+        statusChangedSubscribers.add(func)
+    }
+
+    fun sendRequest(score:scoreType) {
+        val localization = localizationSensor.lastLocation ?: return
+
         try{
             val queue = Volley.newRequestQueue(context)
-            val url = "https://workmanagementsystemtab.azurewebsites.net/Authorization/login"
+            val jsonObject:JSONObject = JSONObject()
+            jsonObject.put("latitude",localization.latitude)
+            jsonObject.put("longitude",localization.longitude)
+            jsonObject.put("score",score)
 
-            val xd:JSONObject = JSONObject()
-            xd.put("email","string")
-            xd.put("password","string")
-// Request a string response from the provided URL.
             val stringRequest = JsonObjectRequest(
-                Request.Method.POST, url, xd
+                Request.Method.POST, serverPostUrl, jsonObject
                 ,
                 Response.Listener<JSONObject> { response ->
-                    xx(v.y.toString() + response.toString())
+                    okResponse(response)
                 },
-                Response.ErrorListener { response -> xx(response = response.toString()) })
+                Response.ErrorListener { response -> errorResponse(response) })
 
-// Add the request to the RequestQueue.
             queue.add(stringRequest)
-        }catch (e:Exception){
-            odpowiedz= e.toString()
+        }
+        catch (e:Exception){
+            val yyy = e.toString()
         }
     }
 
-    fun xx(response:String) {
-        try{
-            odpowiedz = "Response is: ${response.substring(0, 500)}"
-        }catch (e:Exception) {
-            odpowiedz = e.toString()
-        }
+    private fun okResponse(s:JSONObject?) {
+        //TODO
+        val xxxxx = s
     }
+
+    private  fun errorResponse(s:VolleyError?) {
+        //TODO
+        val x=2
+    }
+
 }
