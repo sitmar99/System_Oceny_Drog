@@ -31,12 +31,14 @@ class AccelerometerSensor(context: Context) : SensorEventListener {
     private var lastAccValue: Vector3D = Vector3D()
     private var settledGravityValue: Vector3D = Vector3D()
     private var chosenCoordinate:CoordinateEnum = CoordinateEnum.Z;
-    companion object {
+
+    public companion object {
         private const val DEFAULT_MOTION_TRIGGER_LIMIT = 2f
         private const val PROJECTION_SCALING_FACTOR_TRIGGER = 0.2f
-        private const val TIME_START_BIAS = 3000L
-        private const val TIME_BIAS_AFTER_CHANGE = 1000L
         private const val G = 9.81f
+        var TIME_START_BIAS = 3000L
+        var TIME_AFTER_CHANGE_BIAS = 3000L
+        var ACC_BIAS = 0.5f
     }
 
     init {
@@ -63,10 +65,9 @@ class AccelerometerSensor(context: Context) : SensorEventListener {
         sensorManager.registerListener(this, gravitySensor, SensorManager.SENSOR_DELAY_NORMAL)
         sensorManager.registerListener(this, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL)
         BackgroundManager.notifyStatusSubs(true)
-        Timer().schedule(TIME_BIAS_AFTER_CHANGE){
+        Timer().schedule(TIME_AFTER_CHANGE_BIAS){
             afterInitSettle()
         }
-
     }
 
     fun stop() {
@@ -118,18 +119,15 @@ class AccelerometerSensor(context: Context) : SensorEventListener {
     override fun onAccuracyChanged(sensor: Sensor, i: Int) {}
 
     private fun onUpdate() {
-        if(significantMotionDetected() && !acceleration.epsilonEquals(lastAccValue,0.5f)) {
+        if(significantMotionDetected() && !acceleration.epsilonEquals(lastAccValue, ACC_BIAS)) {
             lastAccValue = acceleration
             sensorSettled = false
-            Timer().schedule(3*TIME_BIAS_AFTER_CHANGE) {
+            Timer().schedule(TIME_AFTER_CHANGE_BIAS) {
                 sensorSettled = true
             }
             BackgroundManager.notifyAccSubs(evaluateScore())
-
         }
     }
-
-
 
      fun evaluateScore():Float  {
         return when(chosenCoordinate) {
@@ -138,6 +136,4 @@ class AccelerometerSensor(context: Context) : SensorEventListener {
             CoordinateEnum.Z -> kotlin.math.abs(gravity.z - settledGravityValue.z)
         }
     }
-
-
 }
