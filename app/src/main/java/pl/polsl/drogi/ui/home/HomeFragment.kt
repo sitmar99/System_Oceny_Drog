@@ -14,26 +14,23 @@ import pl.polsl.drogi.R
 
 class HomeFragment : Fragment() {
 
-    var textStatus : TextView? = null
+    var textStatus: TextView? = null
     var startButton: Button? = null
     var stopButton: Button? = null
-    private var x:String="s"
+    private var x: String = "s"
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
-
-
 
         val root = inflater.inflate(R.layout.fragment_home, container, false)
 
         textStatus = root.findViewById(R.id.text_status)
-        startButton= root.findViewById(R.id.button_start)
+        startButton = root.findViewById(R.id.button_start)
         stopButton = root.findViewById(R.id.button_stop)
 
         BackgroundManager.subscribeAcc {
-
         }
 
         BackgroundManager.subscribeStatusChanged {
@@ -41,28 +38,25 @@ class HomeFragment : Fragment() {
         }
 
         startButton?.setOnClickListener {
-                BackgroundManager.start()
-            }
+            BackgroundManager.start()
+        }
 
         stopButton?.setOnClickListener {
-                BackgroundManager.stop()
-            }
+            BackgroundManager.stop()
+        }
 
 
         onStatusChanged(BackgroundManager.status)
         return root
     }
 
-    fun onStatusChanged(newStatus:Boolean) {
-        if(newStatus) {
+    fun onStatusChanged(newStatus: Boolean) {
+        if (newStatus) {
             textStatus?.text = "ACTIVE"
             textStatus?.setTextColor(Color.GREEN)
-        }
-        else {
+        } else {
             textStatus?.text = "INACTIVE"
             textStatus?.setTextColor(Color.RED)
         }
-
     }
-
 }

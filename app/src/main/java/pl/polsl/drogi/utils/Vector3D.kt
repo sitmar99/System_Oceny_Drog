@@ -4,9 +4,9 @@ import kotlin.math.abs
 
 
 class Vector3D {
-     var x: Float
-     var y: Float
-     var z: Float
+    var x: Float
+    var y: Float
+    var z: Float
 
     constructor() {
         x = 0f
@@ -20,15 +20,15 @@ class Vector3D {
         z = _z
     }
 
-    fun equals(v:Vector3D):Boolean {
-        return v.x == x && v.y ==  y && v.z == z
+    fun equals(v: Vector3D): Boolean {
+        return v.x == x && v.y == y && v.z == z
     }
 
-    fun epsilonEquals(v:Vector3D,bias:Float):Boolean {
-        return abs(x-v.x) < bias || abs(y-v.y) < bias || abs(z-v.z) < bias
+    fun epsilonEquals(v: Vector3D, bias: Float): Boolean {
+        return abs(x - v.x) < bias || abs(y - v.y) < bias || abs(z - v.z) < bias
     }
 
-    operator fun plus(v:Vector3D): Vector3D {
+    operator fun plus(v: Vector3D): Vector3D {
         return Vector3D(x + v.x, y + v.y, z + v.z)
     }
 
@@ -44,10 +44,10 @@ class Vector3D {
         return dot(onToVector) / onToVector.dot(onToVector)
     }
 
-    fun abs():Vector3D{
+    fun abs(): Vector3D {
         x = abs(x)
         y = abs(y)
         z = abs(z)
-        return Vector3D(x,y,z)
+        return Vector3D(x, y, z)
     }
 }

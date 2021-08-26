@@ -16,8 +16,8 @@ import kotlin.math.abs
 
 class AccelerometerSensor(context: Context) : SensorEventListener {
 
-    private enum class CoordinateEnum{
-        X,Y,Z
+    private enum class CoordinateEnum {
+        X, Y, Z
     }
 
     private val sensorManager: SensorManager
@@ -30,7 +30,7 @@ class AccelerometerSensor(context: Context) : SensorEventListener {
 
     private var lastAccValue: Vector3D = Vector3D()
     private var settledGravityValue: Vector3D = Vector3D()
-    private var chosenCoordinate:CoordinateEnum = CoordinateEnum.Z;
+    private var chosenCoordinate: CoordinateEnum = CoordinateEnum.Z;
 
     public companion object {
         private const val DEFAULT_MOTION_TRIGGER_LIMIT = 2f
@@ -65,7 +65,7 @@ class AccelerometerSensor(context: Context) : SensorEventListener {
         sensorManager.registerListener(this, gravitySensor, SensorManager.SENSOR_DELAY_NORMAL)
         sensorManager.registerListener(this, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL)
         BackgroundManager.notifyStatusSubs(true)
-        Timer().schedule(TIME_AFTER_CHANGE_BIAS){
+        Timer().schedule(TIME_AFTER_CHANGE_BIAS) {
             afterInitSettle()
         }
     }
@@ -74,22 +74,23 @@ class AccelerometerSensor(context: Context) : SensorEventListener {
         sensorManager.unregisterListener(this)
         BackgroundManager.notifyStatusSubs(false)
     }
+
     private fun afterInitSettle() {
         settledGravityValue = gravity
         chosenCoordinate = getCoordinate()
         sensorSettled = true
     }
 
-    private fun getCoordinate():CoordinateEnum{
-        val subAbs = (settledGravityValue.abs() - Vector3D(G,G,G)).abs()
-        var tmpCoordinate:CoordinateEnum = CoordinateEnum.X;
+    private fun getCoordinate(): CoordinateEnum {
+        val subAbs = (settledGravityValue.abs() - Vector3D(G, G, G)).abs()
+        var tmpCoordinate: CoordinateEnum = CoordinateEnum.X;
         var currentMin = subAbs.x
 
-        if(subAbs.y < currentMin) {
+        if (subAbs.y < currentMin) {
             tmpCoordinate = CoordinateEnum.Y
             currentMin = subAbs.y
         }
-        if(subAbs.z < currentMin) {
+        if (subAbs.z < currentMin) {
             tmpCoordinate = CoordinateEnum.Z
         }
         return tmpCoordinate
@@ -119,7 +120,7 @@ class AccelerometerSensor(context: Context) : SensorEventListener {
     override fun onAccuracyChanged(sensor: Sensor, i: Int) {}
 
     private fun onUpdate() {
-        if(significantMotionDetected() && !acceleration.epsilonEquals(lastAccValue, ACC_BIAS)) {
+        if (significantMotionDetected() && !acceleration.epsilonEquals(lastAccValue, ACC_BIAS)) {
             lastAccValue = acceleration
             sensorSettled = false
             Timer().schedule(TIME_AFTER_CHANGE_BIAS) {
@@ -129,8 +130,8 @@ class AccelerometerSensor(context: Context) : SensorEventListener {
         }
     }
 
-     fun evaluateScore():Float  {
-        return when(chosenCoordinate) {
+    fun evaluateScore(): Float {
+        return when (chosenCoordinate) {
             CoordinateEnum.X -> kotlin.math.abs(gravity.x - settledGravityValue.x)
             CoordinateEnum.Y -> kotlin.math.abs(gravity.y - settledGravityValue.y)
             CoordinateEnum.Z -> kotlin.math.abs(gravity.z - settledGravityValue.z)

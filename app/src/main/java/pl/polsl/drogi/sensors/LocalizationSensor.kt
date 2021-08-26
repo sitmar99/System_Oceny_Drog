@@ -16,30 +16,30 @@ import androidx.core.app.ActivityCompat
 class LocalizationSensor(context: Context) : LocationListener {
     private val locationManager: LocationManager
 
-     companion object {
-         private const val MIN_TIME_BETWEEN_UPDATES: Long = 1000
-         private const val MIN_DIST_BETWEEN_UPDATES = 2f
-     }
+    companion object {
+        private const val MIN_TIME_BETWEEN_UPDATES: Long = 1000
+        private const val MIN_DIST_BETWEEN_UPDATES = 2f
+    }
 
-     var lastLocation:Location? = null
+    var lastLocation: Location? = null
 
-     init {
-         locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+    init {
+        locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        if (ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
-             // TODO: Consider calling
-             //    ActivityCompat#requestPermissions
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
 
-             // here to request the missing permissions, and then overriding
-             //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-             //                                          int[] grantResults)
-             // to handle the case where the user grants the permission. See the documentation
-             // for ActivityCompat#requestPermissions for more details.
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
 
-         }
-         lastLocation= locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+        }
+        lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
 
-     }
+    }
 
     fun start() {
 
@@ -64,7 +64,6 @@ class LocalizationSensor(context: Context) : LocationListener {
     }
 
     override fun onStatusChanged(s: String?, i: Int, bundle: Bundle?) {}
-
 
 
 }

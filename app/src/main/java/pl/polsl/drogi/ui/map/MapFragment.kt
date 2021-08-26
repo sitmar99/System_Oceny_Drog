@@ -41,7 +41,6 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
         val root = inflater.inflate(R.layout.fragment_map, container, false)
         lastLocation = BackgroundManager.localizationSensor.lastLocation
 
-
         val mapFragment = childFragmentManager?.findFragmentById(R.id.map)
                 as SupportMapFragment
         mapFragment.getMapAsync(this)

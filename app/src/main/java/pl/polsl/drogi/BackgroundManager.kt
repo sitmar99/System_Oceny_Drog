@@ -11,7 +11,9 @@ import org.json.JSONObject
 import pl.polsl.drogi.sensors.AccelerometerSensor
 import pl.polsl.drogi.sensors.LocalizationSensor
 import java.lang.Exception
+
 typealias scoreType = Float
+
 @SuppressLint("StaticFieldLeak")
 object BackgroundManager {
 
@@ -19,11 +21,13 @@ object BackgroundManager {
 
     lateinit var accelerometerSensor: AccelerometerSensor
     lateinit var localizationSensor: LocalizationSensor
-    var context :Context? = null
-    private val accSubscribers=  mutableListOf<(scoreType) -> Unit>()
+    var context: Context? = null
+    private val accSubscribers = mutableListOf<(scoreType) -> Unit>()
     private var statusChangedSubscribers = mutableListOf<(Boolean) -> Unit>()
-    var status:Boolean = false
-    init {}
+    var status: Boolean = false
+
+    init {
+    }
 
     fun start() {
         accelerometerSensor.start()
@@ -37,66 +41,64 @@ object BackgroundManager {
         status = false
     }
 
-    fun veryLateInit(context:Context) {
+    fun veryLateInit(context: Context) {
         this.context = context
         accelerometerSensor = AccelerometerSensor(context);
         localizationSensor = LocalizationSensor(context)
         this.subscribeAcc { sendRequest(it) }
     }
 
-    fun notifyAccSubs(score:scoreType) {
+    fun notifyAccSubs(score: scoreType) {
         accSubscribers.forEach {
             it.invoke(score)
         }
     }
 
-    fun notifyStatusSubs(activeStatus:Boolean) {
-        statusChangedSubscribers.forEach{
+    fun notifyStatusSubs(activeStatus: Boolean) {
+        statusChangedSubscribers.forEach {
             it.invoke(activeStatus)
         }
     }
 
-    fun subscribeAcc(func:(scoreType)->Unit) {
+    fun subscribeAcc(func: (scoreType) -> Unit) {
         accSubscribers.add(func)
     }
 
-    fun subscribeStatusChanged(func:(Boolean)->Unit) {
+    fun subscribeStatusChanged(func: (Boolean) -> Unit) {
         statusChangedSubscribers.add(func)
     }
 
-    fun sendRequest(score:scoreType) {
+    fun sendRequest(score: scoreType) {
         val localization = localizationSensor.lastLocation ?: return
 
-        try{
+        try {
             val queue = Volley.newRequestQueue(context)
-            val jsonObject:JSONObject = JSONObject()
-            jsonObject.put("latitude",localization.latitude)
-            jsonObject.put("longitude",localization.longitude)
-            jsonObject.put("score",score)
+            val jsonObject: JSONObject = JSONObject()
+            jsonObject.put("latitude", localization.latitude)
+            jsonObject.put("longitude", localization.longitude)
+            jsonObject.put("score", score)
 
             val stringRequest = JsonObjectRequest(
-                Request.Method.POST, serverPostUrl, jsonObject
-                ,
-                Response.Listener<JSONObject> { response ->
-                    okResponse(response)
-                },
-                Response.ErrorListener { response -> errorResponse(response) })
+                    Request.Method.POST, serverPostUrl, jsonObject,
+                    Response.Listener<JSONObject> { response ->
+                        okResponse(response)
+                    },
+                    Response.ErrorListener { response -> errorResponse(response) })
 
             queue.add(stringRequest)
-        }
-        catch (e:Exception){
+        } catch (e: Exception) {
             val yyy = e.toString()
         }
     }
 
-    private fun okResponse(s:JSONObject?) {
+    private fun okResponse(s: JSONObject?) {
         //TODO
         val xxxxx = s
     }
 
-    private  fun errorResponse(s:VolleyError?) {
+    private fun errorResponse(s: VolleyError?) {
         //TODO
-        val x=2
+        val x = 2
     }
 
 }
