@@ -22,8 +22,6 @@ class SettingsFragment : Fragment() {
     private var editTimeAfterChangeBias:EditText?=null
     private var editAccBias:EditText?=null
 
-    private lateinit var sup:TextView
-    private var xd:Int = 0
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -47,29 +45,47 @@ class SettingsFragment : Fragment() {
 
             override fun beforeTextChanged(s: CharSequence, start: Int,
                                            count: Int, after: Int) {
-                val x =2
             }
 
             override fun onTextChanged(s: CharSequence, start: Int,
                                        before: Int, count: Int) {
-                val x =2
+
+                AccelerometerSensor.TIME_START_BIAS = s.toString().toLongOrNull() ?: AccelerometerSensor.TIME_START_BIAS
             }
         })
 
-        sup = root.findViewById(R.id.superPartia)
-        sup.text = "aaaa"
+        editTimeAfterChangeBias?.addTextChangedListener(object : TextWatcher {
 
-        Timer("Settingup",false).schedule(500,100){
+            override fun afterTextChanged(s: Editable) {}
+            override fun beforeTextChanged(s: CharSequence, start: Int,
+                                           count: Int, after: Int) {}
 
-            activity?.runOnUiThread{
-                xd++
-                sup.text = xd.toString()
+            override fun onTextChanged(s: CharSequence, start: Int,
+                                       before: Int, count: Int) {
+
+                AccelerometerSensor.TIME_AFTER_CHANGE_BIAS = s.toString().toLongOrNull() ?: AccelerometerSensor.TIME_AFTER_CHANGE_BIAS
             }
-        }
+        })
+
+        editAccBias?.addTextChangedListener(object : TextWatcher {
+
+            override fun afterTextChanged(s: Editable) {}
+            override fun beforeTextChanged(s: CharSequence, start: Int,
+                                           count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence, start: Int,
+                                       before: Int, count: Int) {
+
+                val convertedValue = s.toString().toFloatOrNull()
+
+                if(convertedValue != null && convertedValue > 3)
+                {
+                    editAccBias?.setText("3",TextView.BufferType.EDITABLE)
+                    AccelerometerSensor.ACC_BIAS = convertedValue
+                }
+            }
+        })
+
         return root
     }
-
-
-
-
 }
