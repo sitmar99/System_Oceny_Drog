@@ -214,7 +214,6 @@ class AccelerometerSensor(context: Context) : SensorEventListener {
                 && sensorSettled
     }
 
-
     override fun onSensorChanged(sensorEvent: SensorEvent) {
         val mySensor = sensorEvent.sensor
         if (mySensor.type == Sensor.TYPE_ACCELEROMETER) {
@@ -228,15 +227,15 @@ class AccelerometerSensor(context: Context) : SensorEventListener {
             val z = sensorEvent.values[2]
             gravity = Vector3D(x, y, z)
         }
-        onUpdate(acceleration, gravity)
+        onUpdate()
     }
 
     override fun onAccuracyChanged(sensor: Sensor, i: Int) {}
 
-    private fun onUpdate(a: Vector3D, g: Vector3D) {
-        if(significantMotionDetected() && !a.epsilonEquals(lastAccValue,1f)) {
-            lastAccValue = a
-            BackgroundManager.notifyAccSubs(a)
+    private fun onUpdate() {
+        if(significantMotionDetected() && !acceleration.epsilonEquals(lastAccValue,1f)) {
+            lastAccValue = acceleration
+            BackgroundManager.notifyAccSubs(acceleration)
             sensorSettled = false
 
             Timer().schedule(TIME_BIAS_AFTER_CHANGE) {
