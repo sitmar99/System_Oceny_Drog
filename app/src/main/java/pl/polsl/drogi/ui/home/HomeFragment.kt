@@ -24,6 +24,8 @@ class HomeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
+
+
         val root = inflater.inflate(R.layout.fragment_home, container, false)
 
         textStatus = root.findViewById(R.id.text_status)
@@ -47,6 +49,7 @@ class HomeFragment : Fragment() {
             }
 
 
+        onStatusChanged(BackgroundManager.status)
         return root
     }
 

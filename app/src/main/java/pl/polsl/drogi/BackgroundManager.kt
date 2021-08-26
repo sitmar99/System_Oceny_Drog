@@ -22,16 +22,19 @@ object BackgroundManager {
     var context :Context? = null
     private val accSubscribers=  mutableListOf<(scoreType) -> Unit>()
     private var statusChangedSubscribers = mutableListOf<(Boolean) -> Unit>()
+    var status:Boolean = false
     init {}
 
     fun start() {
         accelerometerSensor.start()
         localizationSensor.start()
+        status = true
     }
 
     fun stop() {
         localizationSensor.stop()
         accelerometerSensor.stop()
+        status = false
     }
 
     fun veryLateInit(context:Context) {
