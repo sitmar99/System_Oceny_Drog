@@ -31,6 +31,7 @@ class AccelerometerSensor(context: Context) : SensorEventListener {
     private var lastAccValue: Vector3D = Vector3D()
     private var settledGravityValue: Vector3D = Vector3D()
     private var chosenCoordinate: CoordinateEnum = CoordinateEnum.Z;
+    private var actitvationGuard: Boolean = true;
 
     public companion object {
         private const val DEFAULT_MOTION_TRIGGER_LIMIT = 2f
@@ -56,21 +57,27 @@ class AccelerometerSensor(context: Context) : SensorEventListener {
     }
 
     fun start() {
+        actitvationGuard = true;
         Timer().schedule(TIME_START_BIAS) {
             registerAfterSettle()
         }
     }
 
     private fun registerAfterSettle() {
-        sensorManager.registerListener(this, gravitySensor, SensorManager.SENSOR_DELAY_NORMAL)
-        sensorManager.registerListener(this, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL)
-        BackgroundManager.notifyStatusSubs(true)
-        Timer().schedule(TIME_AFTER_CHANGE_BIAS) {
-            afterInitSettle()
+        if (actitvationGuard) {
+
+            sensorManager.registerListener(this, gravitySensor, SensorManager.SENSOR_DELAY_NORMAL)
+            sensorManager.registerListener(this, accelerometerSensor, SensorManager.SENSOR_DELAY_NORMAL)
+            BackgroundManager.notifyStatusSubs(true)
+            Timer().schedule(TIME_AFTER_CHANGE_BIAS) {
+                afterInitSettle()
+            }
         }
+
     }
 
     fun stop() {
+        actitvationGuard = false;
         sensorManager.unregisterListener(this)
         BackgroundManager.notifyStatusSubs(false)
     }
