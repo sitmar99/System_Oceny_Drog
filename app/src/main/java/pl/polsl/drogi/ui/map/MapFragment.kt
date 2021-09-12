@@ -12,7 +12,6 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonArrayRequest
-import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -25,7 +24,6 @@ import org.json.JSONArray
 import pl.polsl.drogi.BackgroundManager
 import pl.polsl.drogi.R
 import java.lang.Exception
-import org.json.JSONObject
 
 class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
@@ -65,7 +63,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
         map.moveCamera(CameraUpdateFactory.newLatLng(myPlace))
 
         //TODO change url
-        getJson("http://192.168.1.11:5000")
+        getJson(BackgroundManager.serverUrl + "/Coordinates")
 
         map.uiSettings.isZoomControlsEnabled = true
         map.setOnMarkerClickListener(this)
@@ -103,7 +101,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
             val id = response.getJSONObject(i).getString("id")
             var lat = response.getJSONObject(i).getString("latitude").toDoubleOrNull()
             var long = response.getJSONObject(i).getString("longtitude").toDoubleOrNull()
-            var score = response.getJSONObject(i).getString("score").toIntOrNull()
+            var score = response.getJSONObject(i).getString("score").toDoubleOrNull()
 
             if (lat == null || long == null) {
                 lat = 52.0
@@ -115,7 +113,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
     }
 
     private fun errorResponse(err: VolleyError?) {
-        Toast.makeText(BackgroundManager.context, "Response error", Toast.LENGTH_LONG).show()
+        Toast.makeText(BackgroundManager.context, "Server timeout", Toast.LENGTH_LONG).show()
     }
 
     private fun setUpMap() {

@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.widget.Toast
 import com.android.volley.Request
-import com.android.volley.Response
 import com.android.volley.VolleyError
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
@@ -18,7 +17,7 @@ typealias scoreType = Float
 @SuppressLint("StaticFieldLeak")
 object BackgroundManager {
 
-    const val serverPostUrl = "https://webhook.site/f8f5c994-3905-4a31-96b1-37c56342e46e"
+    const val serverUrl = "http://192.168.1.11:45455"
 
     lateinit var accelerometerSensor: AccelerometerSensor
     lateinit var localizationSensor: LocalizationSensor
@@ -76,11 +75,11 @@ object BackgroundManager {
             val queue = Volley.newRequestQueue(context)
             val jsonObject: JSONObject = JSONObject()
             jsonObject.put("latitude", localization.latitude)
-            jsonObject.put("longitude", localization.longitude)
+            jsonObject.put("longtitude", localization.longitude)
             jsonObject.put("score", score)
 
             val stringRequest = JsonObjectRequest(
-                Request.Method.POST, serverPostUrl, jsonObject,
+                Request.Method.POST, "$serverUrl/Coordinate", jsonObject,
                 { response ->
                     okResponse(response)
                 },
@@ -98,7 +97,7 @@ object BackgroundManager {
     }
 
     private fun errorResponse(error: VolleyError?) {
-        Toast.makeText(context, "Response error", Toast.LENGTH_LONG).show()
+        Toast.makeText(context, "Server timeout", Toast.LENGTH_LONG).show()
     }
 
 }
