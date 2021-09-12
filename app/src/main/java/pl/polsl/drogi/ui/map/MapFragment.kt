@@ -21,9 +21,15 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import pl.polsl.drogi.BackgroundManager
 import pl.polsl.drogi.R
+import java.io.IOException
+import okhttp3.*
+
 
 
 class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+
+    private val client = OkHttpClient()
+    lateinit var result: String
 
     private lateinit var map: GoogleMap
     private var lastLocation: Location? = null
@@ -55,6 +61,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
 
     override fun onMapReady(googleMap: GoogleMap) {
         map = googleMap
+
         var myPlace = LatLng(0.0, 0.0)
         if (lastLocation != null) {
             myPlace = LatLng(lastLocation!!.latitude, lastLocation!!.longitude)
@@ -62,11 +69,54 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
         map.addMarker(MarkerOptions().position(myPlace).title("My Favorite City"))
         map.moveCamera(CameraUpdateFactory.newLatLng(myPlace))
 
+        getJson("https://reqbin.com/echo/get/json")
+        addPoints()
+
         map.uiSettings.isZoomControlsEnabled = true
         map.setOnMarkerClickListener(this)
 
         setUpMap()
     }
+
+    private fun addPoints() {
+        var latitude = 370.0
+        val regex = "latitude\": -*[0-9]*.[0-9]*|longtitude\": -*[0-9]*.[0-9]*".toRegex()
+
+        val match = regex.findAll(result)
+        for (cord in match) {
+            println(cord.value)
+            val negative = "-".toRegex()
+            val pos = "[0-9]+.[0-9]+".toRegex()
+
+            var value = pos.find(cord.value)!!.value.toDouble()
+            if (negative.find(cord.value)?.value == "-") {
+                value = -value
+            }
+
+            if (latitude == 370.0) {
+                latitude = value
+            }
+            else {
+                map.addMarker((MarkerOptions().position(LatLng(latitude, value))))
+                latitude = 370.0
+            }
+        }
+    }
+
+    private fun getJson(url: String) {
+        val request = Request.Builder()
+            .url(url)
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {}
+            override fun onResponse(call: Call, response: Response) = assign(response.body()?.string())
+        })
+    }
+
+    private fun assign(s: String?) {
+        result = s!!
+        }
 
     private fun setUpMap() {
         if (ActivityCompat.checkSelfPermission(activity as Context,
