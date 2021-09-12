@@ -80,24 +80,25 @@ object BackgroundManager {
             jsonObject.put("score", score)
 
             val stringRequest = JsonObjectRequest(
-                    Request.Method.POST, serverPostUrl, jsonObject,
-                    Response.Listener<JSONObject> { response ->
-                        okResponse(response)
-                    },
-                    Response.ErrorListener { response -> errorResponse(response) })
+                Request.Method.POST, serverPostUrl, jsonObject,
+                { response ->
+                    okResponse(response)
+                },
+                { response -> errorResponse(response) })
 
             queue.add(stringRequest)
         } catch (e: Exception) {
-            Toast.makeText(context,"Error occurred during sending request", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "Error occurred during sending request", Toast.LENGTH_LONG)
+                .show()
         }
     }
 
-    private fun okResponse(s: JSONObject?) {
-        Toast.makeText(context,"Bump send", Toast.LENGTH_LONG).show()
+    private fun okResponse(response: JSONObject?) {
+        Toast.makeText(context, "Bump send", Toast.LENGTH_LONG).show()
     }
 
-    private fun errorResponse(s: VolleyError?) {
-        Toast.makeText(context,"Response error", Toast.LENGTH_LONG).show()
+    private fun errorResponse(error: VolleyError?) {
+        Toast.makeText(context, "Response error", Toast.LENGTH_LONG).show()
     }
 
 }

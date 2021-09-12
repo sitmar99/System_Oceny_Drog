@@ -37,9 +37,9 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
     }
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
 
         val root = inflater.inflate(R.layout.fragment_map, container, false)
@@ -64,7 +64,7 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
         map.addMarker(MarkerOptions().position(myPlace).title("My location"))
         map.moveCamera(CameraUpdateFactory.newLatLng(myPlace))
 
-        //change it to
+        //TODO change url
         getJson("http://192.168.1.11:5000")
 
         map.uiSettings.isZoomControlsEnabled = true
@@ -73,53 +73,61 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
         setUpMap()
     }
 
-
     private fun getJson(url: String) {
 
         try {
             val queue = Volley.newRequestQueue(BackgroundManager.context)
             val stringRequest = JsonArrayRequest(
-                    com.android.volley.Request.Method.GET, url, null,
-                    com.android.volley.Response.Listener{ response ->
-                        okResponse(response)
-                    },
-                    com.android.volley.Response.ErrorListener { response ->
-                        errorResponse(response)
-                    })
+                com.android.volley.Request.Method.GET, url, null,
+                { response ->
+                    okResponse(response)
+                },
+                { response ->
+                    errorResponse(response)
+                })
 
             queue.add(stringRequest)
 
         } catch (e: Exception) {
-            Toast.makeText(BackgroundManager.context,"Error occurred during sending request", Toast.LENGTH_LONG).show()
+            Toast.makeText(
+                BackgroundManager.context,
+                "Error occurred during sending request",
+                Toast.LENGTH_LONG
+            ).show()
         }
     }
 
     private fun okResponse(response: JSONArray) {
 
-            for (i in 0 until response.length()) {
-                val id = response.getJSONObject(i).getString("id")
-                var lat = response.getJSONObject(i).getString("latitude").toDoubleOrNull()
-                var long  = response.getJSONObject(i).getString("longtitude").toDoubleOrNull()
-                var score =  response.getJSONObject(i).getString("score").toIntOrNull()
+        for (i in 0 until response.length()) {
+            val id = response.getJSONObject(i).getString("id")
+            var lat = response.getJSONObject(i).getString("latitude").toDoubleOrNull()
+            var long = response.getJSONObject(i).getString("longtitude").toDoubleOrNull()
+            var score = response.getJSONObject(i).getString("score").toIntOrNull()
 
-                if(lat == null || long == null) {
-                    lat = 52.0
-                    long = 21.0
+            if (lat == null || long == null) {
+                lat = 52.0
+                long = 21.0
 
-                }
-                map.addMarker(MarkerOptions().position(LatLng(lat,long)))
             }
+            map.addMarker(MarkerOptions().position(LatLng(lat, long)))
+        }
     }
 
     private fun errorResponse(err: VolleyError?) {
-        Toast.makeText(BackgroundManager.context,"Response error", Toast.LENGTH_LONG).show()
+        Toast.makeText(BackgroundManager.context, "Response error", Toast.LENGTH_LONG).show()
     }
 
     private fun setUpMap() {
-        if (ActivityCompat.checkSelfPermission(activity as Context,
-                        android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(
+                activity as Context,
+                android.Manifest.permission.ACCESS_FINE_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
             requestPermissions(
-                    arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_PERMISSION_REQUEST_CODE)
+                arrayOf(android.Manifest.permission.ACCESS_FINE_LOCATION),
+                LOCATION_PERMISSION_REQUEST_CODE
+            )
             return
         }
 

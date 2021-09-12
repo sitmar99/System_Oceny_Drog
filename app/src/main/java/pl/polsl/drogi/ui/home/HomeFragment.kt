@@ -19,9 +19,9 @@ class HomeFragment : Fragment() {
     var stopButton: Button? = null
     private var x: String = "s"
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
 
         val root = inflater.inflate(R.layout.fragment_home, container, false)
