@@ -2,6 +2,7 @@ package pl.polsl.drogi
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.widget.Toast
 import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.VolleyError
@@ -17,7 +18,7 @@ typealias scoreType = Float
 @SuppressLint("StaticFieldLeak")
 object BackgroundManager {
 
-    const val serverPostUrl = "https://webhook.site/03a1d307-a37a-463d-bd8f-c5b49543e988"
+    const val serverPostUrl = "https://webhook.site/f8f5c994-3905-4a31-96b1-37c56342e46e"
 
     lateinit var accelerometerSensor: AccelerometerSensor
     lateinit var localizationSensor: LocalizationSensor
@@ -87,18 +88,16 @@ object BackgroundManager {
 
             queue.add(stringRequest)
         } catch (e: Exception) {
-            val yyy = e.toString()
+            Toast.makeText(context,"Error occurred during sending request", Toast.LENGTH_LONG).show()
         }
     }
 
     private fun okResponse(s: JSONObject?) {
-        //TODO
-        val xxxxx = s
+        Toast.makeText(context,"Bump send", Toast.LENGTH_LONG).show()
     }
 
     private fun errorResponse(s: VolleyError?) {
-        //TODO
-        val x = 2
+        Toast.makeText(context,"Response error", Toast.LENGTH_LONG).show()
     }
 
 }

@@ -7,11 +7,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentTransaction
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
+import com.android.volley.VolleyError
+import com.android.volley.toolbox.JsonArrayRequest
+import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.Volley
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -19,17 +21,13 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
+import org.json.JSONArray
 import pl.polsl.drogi.BackgroundManager
 import pl.polsl.drogi.R
-import java.io.IOException
-import okhttp3.*
-
-
+import java.lang.Exception
+import org.json.JSONObject
 
 class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
-
-    private val client = OkHttpClient()
-    lateinit var result: String
 
     private lateinit var map: GoogleMap
     private var lastLocation: Location? = null
@@ -49,28 +47,25 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
 
         val mapFragment = childFragmentManager?.findFragmentById(R.id.map)
                 as SupportMapFragment
+
         mapFragment.getMapAsync(this)
 
-//            val mMapFragment = SupportMapFragment.newInstance()
-//            val fragmentTransaction: FragmentTransaction = childFragmentManager.beginTransaction()
-//            fragmentTransaction.add(R.id.map, mMapFragment)
-//            fragmentTransaction.commit()
-//            mMapFragment.getMapAsync(this)
         return root
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
+
         map = googleMap
 
         var myPlace = LatLng(0.0, 0.0)
         if (lastLocation != null) {
             myPlace = LatLng(lastLocation!!.latitude, lastLocation!!.longitude)
         }
-        map.addMarker(MarkerOptions().position(myPlace).title("My Favorite City"))
+        map.addMarker(MarkerOptions().position(myPlace).title("My location"))
         map.moveCamera(CameraUpdateFactory.newLatLng(myPlace))
 
-        getJson("https://reqbin.com/echo/get/json")
-        addPoints()
+        //change it to
+        getJson("http://192.168.1.11:5000")
 
         map.uiSettings.isZoomControlsEnabled = true
         map.setOnMarkerClickListener(this)
@@ -78,45 +73,47 @@ class MapFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListe
         setUpMap()
     }
 
-    private fun addPoints() {
-        var latitude = 370.0
-        val regex = "latitude\": -*[0-9]*.[0-9]*|longtitude\": -*[0-9]*.[0-9]*".toRegex()
-
-        val match = regex.findAll(result)
-        for (cord in match) {
-            println(cord.value)
-            val negative = "-".toRegex()
-            val pos = "[0-9]+.[0-9]+".toRegex()
-
-            var value = pos.find(cord.value)!!.value.toDouble()
-            if (negative.find(cord.value)?.value == "-") {
-                value = -value
-            }
-
-            if (latitude == 370.0) {
-                latitude = value
-            }
-            else {
-                map.addMarker((MarkerOptions().position(LatLng(latitude, value))))
-                latitude = 370.0
-            }
-        }
-    }
 
     private fun getJson(url: String) {
-        val request = Request.Builder()
-            .url(url)
-            .build()
 
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {}
-            override fun onResponse(call: Call, response: Response) = assign(response.body()?.string())
-        })
+        try {
+            val queue = Volley.newRequestQueue(BackgroundManager.context)
+            val stringRequest = JsonArrayRequest(
+                    com.android.volley.Request.Method.GET, url, null,
+                    com.android.volley.Response.Listener{ response ->
+                        okResponse(response)
+                    },
+                    com.android.volley.Response.ErrorListener { response ->
+                        errorResponse(response)
+                    })
+
+            queue.add(stringRequest)
+
+        } catch (e: Exception) {
+            Toast.makeText(BackgroundManager.context,"Error occurred during sending request", Toast.LENGTH_LONG).show()
+        }
     }
 
-    private fun assign(s: String?) {
-        result = s!!
-        }
+    private fun okResponse(response: JSONArray) {
+
+            for (i in 0 until response.length()) {
+                val id = response.getJSONObject(i).getString("id")
+                var lat = response.getJSONObject(i).getString("latitude").toDoubleOrNull()
+                var long  = response.getJSONObject(i).getString("longtitude").toDoubleOrNull()
+                var score =  response.getJSONObject(i).getString("score").toIntOrNull()
+
+                if(lat == null || long == null) {
+                    lat = 52.0
+                    long = 21.0
+
+                }
+                map.addMarker(MarkerOptions().position(LatLng(lat,long)))
+            }
+    }
+
+    private fun errorResponse(err: VolleyError?) {
+        Toast.makeText(BackgroundManager.context,"Response error", Toast.LENGTH_LONG).show()
+    }
 
     private fun setUpMap() {
         if (ActivityCompat.checkSelfPermission(activity as Context,
